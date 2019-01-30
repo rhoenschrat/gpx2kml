@@ -72,22 +72,29 @@ public class KmlLineExporter {
 			
 			Element colorElement = doc.createElement("color");
 			lineStyleElement.appendChild(colorElement);
-			colorElement.appendChild(doc.createTextNode("bf00aaff"));
+			colorElement.appendChild(doc.createTextNode(track.getLineKmlColor()));
 			
 			Element widthElement = doc.createElement("width");
 			lineStyleElement.appendChild(widthElement);
-			widthElement.appendChild(doc.createTextNode("5"));
+			widthElement.appendChild(doc.createTextNode(track.getLineWidth().toString()));
+
+			Element polyStyleElement = doc.createElement("PolyStyle");
+			styleElement.appendChild(polyStyleElement);
 			
+			colorElement = doc.createElement("color");
+			polyStyleElement.appendChild(colorElement);
+			colorElement.appendChild(doc.createTextNode(track.getPolyKmlColor()));
+
 			// Placemarks
 			
-			Element folderElement = doc.createElement("Folder");
+//			Element folderElement = doc.createElement("Folder");
 
-			nameElement = doc.createElement("name");
-			folderElement.appendChild(nameElement);
-			nameElement.appendChild(doc.createTextNode("Path segments"));
+//			nameElement = doc.createElement("name");
+//			folderElement.appendChild(nameElement);
+//			nameElement.appendChild(doc.createTextNode("Path segments"));
 
 			styleElement = doc.createElement("Style");
-			folderElement.appendChild(styleElement);
+			documentElement.appendChild(styleElement);
 			
 			Element listStyleElement = doc.createElement("ListStyle");
 			styleElement.appendChild(listStyleElement);
@@ -96,17 +103,14 @@ public class KmlLineExporter {
 			listStyleElement.appendChild(itemTypeElement);
 			itemTypeElement.appendChild(doc.createTextNode("checkHideChildren"));
 
-			Integer placemarkCount = 0;
-			Element placemarkElement;
-			
-			placemarkElement = doc.createElement("Placemark");
-			attr = doc.createAttribute("id");
-			attr.setValue(placemarkCount.toString());
-			placemarkElement.setAttributeNode(attr);
+			Element placemarkElement = doc.createElement("Placemark");
+//			attr = doc.createAttribute("id");
+//			attr.setValue(placemarkCount.toString());
+//			placemarkElement.setAttributeNode(attr);
 
 			nameElement = doc.createElement("name");
 			placemarkElement.appendChild(nameElement);
-			nameElement.appendChild(doc.createTextNode(placemarkCount.toString()));
+			nameElement.appendChild(doc.createTextNode(track.getTitle()));
 
 			Element visibilityElement = doc.createElement("visibility");
 			placemarkElement.appendChild(visibilityElement);
@@ -122,25 +126,42 @@ public class KmlLineExporter {
 			Element tessellateElement = doc.createElement("tessellate");
 			lineStringElement.appendChild(tessellateElement);
 			tessellateElement.appendChild(doc.createTextNode("1"));
-
+			
+			Element behaviorElement;
+			switch (track.getBehavior()) {
+				case RELATIVE: 
+					behaviorElement = doc.createElement("altitudeMode");
+					lineStringElement.appendChild(behaviorElement);
+					behaviorElement.appendChild(doc.createTextNode("relativeToGround"));
+					break;
+				case ABSOLUTE:
+					behaviorElement = doc.createElement("altitudeMode");
+					lineStringElement.appendChild(behaviorElement);
+					behaviorElement.appendChild(doc.createTextNode("absolute"));
+					break;
+				case GROUND:
+					break;
+			}
+			
+			if (track.getExtrude()) {
+				Element extrudeElement = doc.createElement("extrude");
+				lineStringElement.appendChild(extrudeElement);
+				extrudeElement.appendChild(doc.createTextNode("1"));
+			}
+			
 			Element coordinatesElement = doc.createElement("coordinates");
 			lineStringElement.appendChild(coordinatesElement);
 			
 			String lineCoords = "";
 			for (Waypoint waypoint : track.getWaypoints()) {
 				lineCoords += waypoint.getLon() + "," + 
-						waypoint.getLat() + ",0 ";
+						waypoint.getLat() + "," + track.getHeight().toString() + " ";
 			}
 
 			
 			coordinatesElement.appendChild(doc.createTextNode(lineCoords));
 			
-			folderElement.appendChild(placemarkElement);
-
-			// Finale 
-			
-			documentElement.appendChild(folderElement);
-
+			documentElement.appendChild(placemarkElement);
 
 			// write the content into xml file
 			TransformerFactory transformerFactory = TransformerFactory.newInstance();
