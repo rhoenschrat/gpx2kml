@@ -4,10 +4,15 @@ public class Waypoint {
 	
 	private String lat;
 	private String lon;
-	
-	public Waypoint(String lat, String lon) {
+	private String ele;
+		
+	public Waypoint(String lat, String lon, String ele) {
 		this.lat = lat;
 		this.lon = lon;
+	}
+
+	public Waypoint(String lat, String lon) {
+		this(lat, lon, "0");
 	}
 
 	public String getLat() {
@@ -24,5 +29,13 @@ public class Waypoint {
 	
 	public void setLon(String lon) {
 		this.lon = lon;
+	}
+
+	public String getEle() {
+		return ele;
+	}
+
+	public void setEle(String ele) {
+		this.ele = ele;
 	}
 }

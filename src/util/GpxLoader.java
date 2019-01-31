@@ -46,11 +46,24 @@ public class GpxLoader {
 	    		if (nNode.getNodeType() == Node.ELEMENT_NODE) {
 
 	    			Element eElement = (Element) nNode;
-
+	    			
 	    			System.out.println("Lat : " + eElement.getAttribute("lat"));
 	    			System.out.println("Lon : " + eElement.getAttribute("lon"));
 	    			
 	    			Waypoint waypoint = new Waypoint(eElement.getAttribute("lat"), eElement.getAttribute("lon"));
+
+	    			NodeList eleList = eElement.getElementsByTagName("ele");
+	    			
+	    			if (eleList.getLength() > 0) {
+	    				Node eleNode = eleList.item(0);
+	    				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+	    					Element eleElement = (Element) eleNode;
+	    					System.out.println("Ele : " + eleElement.getTextContent());
+	    					
+	    					waypoint.setEle(eleElement.getTextContent());
+	    				}
+	    			}
+	    			
 	    			list.add(waypoint);
 	    			
 	    		}

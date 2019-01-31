@@ -87,12 +87,6 @@ public class KmlLineExporter {
 
 			// Placemarks
 			
-//			Element folderElement = doc.createElement("Folder");
-
-//			nameElement = doc.createElement("name");
-//			folderElement.appendChild(nameElement);
-//			nameElement.appendChild(doc.createTextNode("Path segments"));
-
 			styleElement = doc.createElement("Style");
 			documentElement.appendChild(styleElement);
 			
@@ -104,9 +98,6 @@ public class KmlLineExporter {
 			itemTypeElement.appendChild(doc.createTextNode("checkHideChildren"));
 
 			Element placemarkElement = doc.createElement("Placemark");
-//			attr = doc.createAttribute("id");
-//			attr.setValue(placemarkCount.toString());
-//			placemarkElement.setAttributeNode(attr);
 
 			nameElement = doc.createElement("name");
 			placemarkElement.appendChild(nameElement);
@@ -123,23 +114,26 @@ public class KmlLineExporter {
 			Element lineStringElement = doc.createElement("LineString");
 			placemarkElement.appendChild(lineStringElement);
 
-			Element tessellateElement = doc.createElement("tessellate");
-			lineStringElement.appendChild(tessellateElement);
-			tessellateElement.appendChild(doc.createTextNode("1"));
 			
-			Element behaviorElement;
+			Element tessellateElement = doc.createElement("tessellate");
+			Element behaviorElement = doc.createElement("altitudeMode");
+
 			switch (track.getBehavior()) {
 				case RELATIVE: 
-					behaviorElement = doc.createElement("altitudeMode");
-					lineStringElement.appendChild(behaviorElement);
+					lineStringElement.appendChild(tessellateElement);
+					tessellateElement.appendChild(doc.createTextNode("1"));
+
 					behaviorElement.appendChild(doc.createTextNode("relativeToGround"));
+					lineStringElement.appendChild(behaviorElement);
 					break;
 				case ABSOLUTE:
-					behaviorElement = doc.createElement("altitudeMode");
-					lineStringElement.appendChild(behaviorElement);
+				case TRACK:
 					behaviorElement.appendChild(doc.createTextNode("absolute"));
+					lineStringElement.appendChild(behaviorElement);
 					break;
 				case GROUND:
+					lineStringElement.appendChild(tessellateElement);
+					tessellateElement.appendChild(doc.createTextNode("1"));
 					break;
 			}
 			
@@ -153,9 +147,25 @@ public class KmlLineExporter {
 			lineStringElement.appendChild(coordinatesElement);
 			
 			String lineCoords = "";
+			String altitude = "";
 			for (Waypoint waypoint : track.getWaypoints()) {
-				lineCoords += waypoint.getLon() + "," + 
-						waypoint.getLat() + "," + track.getHeight().toString() + " ";
+				switch (track.getBehavior()) {
+					case RELATIVE:
+					case ABSOLUTE:
+						altitude = track.getAltitude().toString();
+						break;
+					case GROUND:
+						altitude = "0";
+						break;
+					case TRACK:
+						altitude = waypoint.getEle(); 
+						break;
+					default:
+						altitude = "0";
+						break;
+					
+				}
+				lineCoords += waypoint.getLon() + "," + waypoint.getLat() + "," + altitude + " ";
 			}
 
 			

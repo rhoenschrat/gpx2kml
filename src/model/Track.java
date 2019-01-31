@@ -8,6 +8,7 @@ import javafx.scene.paint.Color;
 public class Track {
 	
 	public enum Behavior {
+		TRACK,
 		GROUND,
 		RELATIVE,
 		ABSOLUTE
@@ -16,7 +17,7 @@ public class Track {
 	
 	private File trackFile;
 	private String title;
-	private Integer height;
+	private Integer altitude;
 	private Color lineColor;
 	private Integer lineWidth;
 	private Color polyColor;
@@ -27,11 +28,11 @@ public class Track {
 	public Track(File trackFile) {
 		this.trackFile = trackFile;
 		this.title = "GPX Track";
-		this.height = 50;
-		this.lineColor = Color.YELLOW;
+		this.altitude = 10;
+		this.lineColor = Color.rgb(232, 232, 19);
 		this.lineWidth = 5;
-		this.polyColor = Color.AQUAMARINE;
-		this.extrude = true;
+		this.polyColor = Color.rgb(232, 232, 19, 0.5);
+		this.extrude = false;
 		this.behavior = Behavior.RELATIVE; 
 		this.waypoints = new ArrayList<Waypoint>();
 	}
@@ -69,12 +70,12 @@ public class Track {
 		this.title = title;
 	}
 
-	public Integer getHeight() {
-		return height;
+	public Integer getAltitude() {
+		return altitude;
 	}
 
-	public void setHeight(Integer height) {
-		this.height = height;
+	public void setAltitude(Integer altitude) {
+		this.altitude = altitude;
 	}
 
 	public Color getLineColor() {
